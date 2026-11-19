@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { FlatList, StyleSheet, Text, View } from "react-native";
 
+import SignupForm from "@/components/Auth";
 import { supabase } from "../lib/supabase";
 
 type Instrument = {
@@ -42,6 +43,7 @@ export default function App() {
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => <Text style={styles.item}>{item.name}</Text>}
       />
+      <SignupForm />
     </View>
   );
 }
