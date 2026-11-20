@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { FlatList, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 
-import SignupForm from "@/components/Auth";
+import SignupForm from "@/components/SignUp";
 import { supabase } from "../lib/supabase";
 
 type Instrument = {
@@ -10,7 +10,6 @@ type Instrument = {
 };
 
 export default function App() {
-  const [instruments, setInstruments] = useState<Instrument[]>([]);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -24,8 +23,6 @@ export default function App() {
       setError(error.message);
       return;
     }
-
-    setInstruments(data ?? []);
   }
 
   if (error) {
@@ -38,11 +35,6 @@ export default function App() {
 
   return (
     <View style={styles.container}>
-      <FlatList
-        data={instruments}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={({ item }) => <Text style={styles.item}>{item.name}</Text>}
-      />
       <SignupForm />
     </View>
   );
