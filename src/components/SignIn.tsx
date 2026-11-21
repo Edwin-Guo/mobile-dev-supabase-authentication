@@ -31,7 +31,7 @@ function Field({ control, name, secure, email }: FieldProps) {
       }) => (
         <View>
           <TextInput
-            style={styles.fieldBox}
+            style={[styles.fieldBox, error && styles.invalidField]}
             secureTextEntry={secure}
             keyboardType={email ? "email-address" : "default"}
             autoCapitalize="none"
@@ -119,8 +119,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 10,
     backgroundColor: "#e8e8e8",
+    borderWidth: 1,
+    borderColor: "#e8e8e8",
     width: 300,
     height: 40,
+  },
+  invalidField: {
+    borderColor: "#ff0000",
   },
   error: { color: "#ff0000", fontWeight: "bold" },
   button: {
