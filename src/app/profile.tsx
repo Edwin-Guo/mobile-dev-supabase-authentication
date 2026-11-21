@@ -19,9 +19,12 @@ const profile = () => {
     const { data, error } = await supabase.from("profiles").select();
 
     if (error) {
-      // setError(error.message);
+      console.log("Could not fetch profiles");
+      console.log(error);
       return;
     }
+    console.log("Fetched profiles:", data)
+    setProfiles(data);
   }
   return (
     <View>
