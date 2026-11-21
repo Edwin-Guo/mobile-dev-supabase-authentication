@@ -1,24 +1,17 @@
+import { SignInData, signInSchema } from "@/schemas/signIn";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { router } from "expo-router";
 import { useState } from "react";
 import { Control, Controller, FieldPath, useForm } from "react-hook-form";
 import {
-    ActivityIndicator,
-    Pressable,
-    StyleSheet,
-    Text,
-    TextInput,
-    View,
+  ActivityIndicator,
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
 } from "react-native";
-import { z } from "zod";
 import { supabase } from "../lib/supabase";
-
-const signInSchema = z.object({
-  email: z.email("Please enter a valid email").trim(),
-  password: z.string().min(1, "Password is required."),
-});
-
-type SignInData = z.infer<typeof signInSchema>;
 
 type FieldProps = {
   control: Control<SignInData>;
