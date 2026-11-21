@@ -38,6 +38,7 @@ function Field({ control, name, secure, email }: FieldProps) {
             onChangeText={onChange}
             onBlur={onBlur}
             value={value}
+            autoCorrect={false}
           />
           {error && <Text style={styles.error}>{error.message}</Text>}
         </View>
@@ -77,7 +78,6 @@ const SignInForm = () => {
         setError(friendlyError(error.message));
         return;
       }
-      router.replace("/profile");
     } catch (e) {
       setError(friendlyError(e instanceof Error ? e.message : ""));
     } finally {
@@ -105,7 +105,7 @@ const SignInForm = () => {
           <Text style={{ color: "#ffffff" }}>Sign In</Text>
         )}
       </Pressable>
-      <Pressable onPress={() => router.navigate("./sign-up")}>
+      <Pressable onPress={() => router.navigate("/sign-up")}>
         <Text style={{ color: "#006fbf" }}>No account? Sign up</Text>
       </Pressable>
     </View>

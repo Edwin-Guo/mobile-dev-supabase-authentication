@@ -4,7 +4,14 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { router } from "expo-router";
 import { useState } from "react";
 import { Control, Controller, FieldPath, useForm } from "react-hook-form";
-import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import {
+  ActivityIndicator,
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 
 type FieldProps = {
   control: Control<SignUpData>;
@@ -99,11 +106,13 @@ const SignupForm = () => {
         onPress={() => handleSubmit(onSubmit)()}
         disabled={isSubmitting}
       >
-        <Text style={styles.buttonText}>
-          {isSubmitting ? "Creating account..." : "Sign Up"}
-        </Text>
+        {isSubmitting ? (
+          <ActivityIndicator color="#ffffff" />
+        ) : (
+          <Text style={styles.buttonText}>Sign Up</Text>
+        )}
       </Pressable>
-      <Pressable onPress={() => router.navigate("./sign-in")}>
+      <Pressable onPress={() => router.navigate("/sign-in")}>
         <Text style={{ color: "#006fbf" }}>
           Already have an account? Sign in
         </Text>
