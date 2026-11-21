@@ -1,17 +1,38 @@
 import { Stack } from "expo-router";
-// import {AuthProvider, useAuth} from "../context/AuthProvider"; // ????
-export default function RootLayout() {
+import { ActivityIndicator, View } from "react-native";
+import { AuthProvider, useAuth } from "../context/AuthProvider";
+
+function RootNavigator() {
+  const { session, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}><ActivityIndicator/>
+      </View>
+    );
+  }
   return (
     <Stack>
-      {/* <Stack.Protected guard={!session}> */}
-
       <Stack.Screen name="index" options={{ title: "Index" }} />
-      {/* </Stack.Protected> */}
-      <Stack.Screen name="auth" options={{ title: "Authenticate" }} />
-      <Stack.Screen name="profile" options={{ title: "Profile" }} />
+      
+      <Stack.Protected guard={!session}>
+        <Stack.Screen name="sign-in" options={{ title: "Sign In" }} />
+        <Stack.Screen name="sign-up" options={{ title: "Sign Up" }} />
+      </Stack.Protected>
+
+      <Stack.Protected guard={!!session}>
+        <Stack.Screen name="profile" options={{ title: "Profile" }} />
+      </Stack.Protected>
     </Stack>
   );
 }
 
-// Have auth provider wrap around navigation(?)
-//
+export default function RootLayout() {
+  return (
+    <AuthProvider>
+      <RootNavigator/>
+    </AuthProvider>
+  );
+}
+
+
