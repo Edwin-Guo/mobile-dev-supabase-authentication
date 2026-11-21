@@ -1,6 +1,7 @@
 import { supabase } from "@/lib/supabase";
 import { SignUpData, signUpSchema } from "@/schemas/signUp";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { router } from "expo-router";
 import { useState } from "react";
 import { Control, Controller, FieldPath, useForm } from "react-hook-form";
 import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
@@ -62,12 +63,17 @@ const SignupForm = () => {
   const onSubmit = async ({ email, password }: SignUpData) => {
     setError(null);
     setNotice("");
-    const { data, error } = await supabase.auth.signUp({ email, password });
-    if (error) {
-      setError(error.message);
-    } else if (!data.session) {
-      // Email Confirmation disabled
-      setNotice("Check your email to confirm your account.");
+    try {
+      const { data, error } = await supabase.auth.signUp({ email, password });
+      if (error) {
+        setError(error.message);
+      } else if (!data.session) {
+        setNotice("Check your email to confirm your account.");
+      }
+    } catch {
+      setError(
+        "Could not reach the server. Check your connection and try again.",
+      );
     }
   };
 
