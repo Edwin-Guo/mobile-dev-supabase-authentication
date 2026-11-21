@@ -1,6 +1,14 @@
 import { supabase } from "@/lib/supabase";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Text, View } from "react-native";
+
+interface Profile {
+  id: string;
+  display_name: string;
+  bio: string;
+  created_at: string;
+}
+
 const profile = () => {
   useEffect(() => {
     getInstruments();
