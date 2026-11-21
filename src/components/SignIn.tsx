@@ -2,7 +2,14 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { router } from "expo-router";
 import { useState } from "react";
 import { Control, Controller, FieldPath, useForm } from "react-hook-form";
-import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import {
+    ActivityIndicator,
+    Pressable,
+    StyleSheet,
+    Text,
+    TextInput,
+    View,
+} from "react-native";
 import { z } from "zod";
 import { supabase } from "../lib/supabase";
 
@@ -48,6 +55,7 @@ function Field({ control, name, secure, email }: FieldProps) {
 
 const SignInForm = () => {
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
   const { control, handleSubmit } = useForm<SignInData>({
     resolver: zodResolver(signInSchema),
     defaultValues: { email: "", password: "" },
@@ -56,15 +64,22 @@ const SignInForm = () => {
 
   const onSubmit = async ({ email, password }: SignInData) => {
     setError(null);
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-    if (error) {
-      setError(error.message);
-      return;
+    setLoading(true);
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      if (error) {
+        setError(error.message);
+        return;
+      }
+      router.replace("/profile");
+    } catch {
+      setError("Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
     }
-    router.replace("/profile");
   };
 
   return (
@@ -76,8 +91,16 @@ const SignInForm = () => {
       <Text style={styles.title}>Password</Text>
       <Field control={control} name="password" secure />
       {error && <Text style={styles.error}>{error}</Text>}
-      <Pressable style={styles.button} onPress={() => handleSubmit(onSubmit)()}>
-        <Text style={{ color: "#ffffff" }}>Sign In</Text>
+      <Pressable
+        style={[styles.button, loading && { opacity: 0.6 }]}
+        disabled={loading}
+        onPress={() => handleSubmit(onSubmit)()}
+      >
+        {loading ? (
+          <ActivityIndicator color="#ffffff" />
+        ) : (
+          <Text style={{ color: "#ffffff" }}>Sign In</Text>
+        )}
       </Pressable>
     </View>
   );
