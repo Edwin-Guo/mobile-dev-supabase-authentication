@@ -1,6 +1,6 @@
 import { supabase } from "@/lib/supabase";
 import { useEffect, useState } from "react";
-import { Text, View } from "react-native";
+import { Text, View, FlatList, StyleSheet } from "react-native";
 
 interface Profile {
   id: string;
@@ -27,9 +27,23 @@ const profile = () => {
     setProfiles(data);
   }
   return (
-    <View>
-      <Text>Successfully signed in</Text>
-      <Text>Welcome</Text>
+    <View style = {styles.container}>
+      <View style = {styles.top}>
+        <Text style = {styles.header}>Successfully signed in!</Text>
+        <Text style = {styles.header}>Welcome!</Text>
+      </View>
+      
+      <FlatList
+      data = {profiles}
+      keyExtractor = {(item) => item.id}
+      contentContainerStyle = {styles.container}
+      renderItem = {({item}) => (
+        <View style = {styles.list}>
+          <Text>Name: {item.display_name}</Text>
+          <Text>Bio: {item.bio || "no bio yet"}</Text>
+          <Text>Created at: {item.created_at}</Text>
+        </View>
+      )}/>
     </View>
   );
 };
