@@ -53,6 +53,16 @@ function Field({ control, name, secure, email }: FieldProps) {
   );
 }
 
+function friendlyError(message: string) {
+  const m = message.toLowerCase();
+  if (m.includes("invalid login")) return "Incorrect email or password.";
+  if (m.includes("email not confirmed"))
+    return "Please confirm your email before signing in.";
+  if (m.includes("network") || m.includes("fetch"))
+    return "Network error. Check your connection and try again.";
+  return message || "Something went wrong. Please try again.";
+}
+
 const SignInForm = () => {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -71,12 +81,12 @@ const SignInForm = () => {
         password,
       });
       if (error) {
-        setError(error.message);
+        setError(friendlyError(error.message));
         return;
       }
       router.replace("/profile");
-    } catch {
-      setError("Something went wrong. Please try again.");
+    } catch (e) {
+      setError(friendlyError(e instanceof Error ? e.message : ""));
     } finally {
       setLoading(false);
     }
