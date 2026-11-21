@@ -112,6 +112,9 @@ const SignInForm = () => {
           <Text style={{ color: "#ffffff" }}>Sign In</Text>
         )}
       </Pressable>
+      <Pressable onPress={() => router.navigate("./SignUp")}>
+        <Text style={{ color: "#006fbf" }}>No account? Sign up</Text>
+      </Pressable>
     </View>
   );
 };
