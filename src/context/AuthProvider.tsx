@@ -1,7 +1,36 @@
-// Create a context that can be used throughout all the pages which checkout the session and stuff
-// To prevent prop drilling
-// Pass down session throughout the entire page
-// Loading can also be added and stuff which can be accessed in layout and render shi from there
-// Check for session details
-// AuthContext.Provider is designed to pass stuff to a child(?)
-// useContext (AuthContext) ?? Make sure it sits inside a context api or something bro idk
+
+import { createContext, useContext, useState, useEffect, type ReactNode} from "react";
+import { Session } from  "@supabase/supabase-js";
+import { supabase } from "../lib/supabase";
+
+type AuthContextType = {
+  session: Session | null;
+  loading: boolean;
+};
+
+const AuthContext = createContext< AuthContextType | undefined >(undefined);
+
+export function AuthProvider({ children }: { children: ReactNode }) {
+  const [session, setSession] = useState<Session | null>(null);
+  const [loading, setLoading] = useState(true);
+  
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => { setSession(session); setLoading(false);
+    });
+    
+    const { data: { subscription }, } = supabase.auth.onAuthStateChange((_event, session) => { setSession(session);
+    });
+     return () => subscription.unsubscribe();
+  }, []);
+
+  return (
+    <AuthContext.Provider value={{ session, loading }}>{children}</AuthContext.Provider>
+  );
+}
+
+export function useAuth() {
+  const ctx = useContext(AuthContext);
+  if (!ctx) throw new Error("useAuth must be used inside <AuthProvider>");
+  return ctx;
+}
+
