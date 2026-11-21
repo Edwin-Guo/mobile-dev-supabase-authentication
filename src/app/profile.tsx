@@ -48,4 +48,36 @@ const profile = () => {
   );
 };
 
+const styles = StyleSheet.create({
+  container: {
+    flex: 1
+  },
+  top: {
+    backgroundColor: "#1e3a5f",
+    alignItems: "center",
+    paddingVertical: 35,
+    paddingHorizontal: 20,
+    borderBottomLeftRadius: 25,
+    borderBottomRightRadius: 25,
+  },
+  header: {
+    fontWeight: "bold",
+    fontSize: 25,
+    color: "white",
+    marginBottom: 8,
+    textAlign: "center"
+  },
+  listContainer: {
+    flexGrow: 1,
+    padding: 20
+  },
+  list: {
+    backgroundColor: "white",
+    padding: 25,
+    borderRadius: 15,
+    marginBottom: 15,
+    alignItems: "center"
+  }
+})
+
 export default profile;
