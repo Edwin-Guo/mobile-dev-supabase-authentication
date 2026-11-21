@@ -1,32 +1,19 @@
+import { supabase } from "@/lib/supabase";
+import { SignUpData, signUpSchema } from "@/schemas/signUp";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { router } from "expo-router";
 import { useState } from "react";
 import { Control, Controller, FieldPath, useForm } from "react-hook-form";
 import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
-import { z } from "zod";
-import { supabase } from "../lib/supabase";
-
-const signUpSchema = z
-  .object({
-    email: z.email("Please enter a valid email").trim(),
-    password: z.string().min(8, "Password must be at least 8 characters long."),
-    confirmPassword: z.string().min(1, "Password confirmation required."),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    error: "Passwords don't match.",
-    path: ["confirmPassword"],
-  });
-
-type SignUpData = z.infer<typeof signUpSchema>;
 
 type FieldProps = {
   control: Control<SignUpData>;
   name: FieldPath<SignUpData>;
   secure?: boolean;
   email?: boolean;
+  disabled?: boolean;
 };
 
-function Field({ control, name, secure, email }: FieldProps) {
+function Field({ control, name, secure, email, disabled }: FieldProps) {
   return (
     <Controller
       control={control}
@@ -37,12 +24,16 @@ function Field({ control, name, secure, email }: FieldProps) {
       }) => (
         <View>
           <TextInput
-            style={styles.fieldBox}
+            style={[styles.fieldBox, error && styles.invalidField]}
             secureTextEntry={secure}
             keyboardType={email ? "email-address" : "default"}
             onChangeText={onChange}
             onBlur={onBlur}
             value={value}
+            autoCapitalize="none"
+            autoComplete={email ? "email" : "new-password"}
+            autoCorrect={false}
+            editable={!disabled}
           />
           {error && <Text style={styles.error}>{error.message}</Text>}
         </View>
@@ -51,12 +42,14 @@ function Field({ control, name, secure, email }: FieldProps) {
   );
 }
 const SignupForm = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState("");
 
-  const { control, handleSubmit } = useForm<SignUpData>({
+  const {
+    control,
+    handleSubmit,
+    formState: { isSubmitting },
+  } = useForm<SignUpData>({
     resolver: zodResolver(signUpSchema),
     defaultValues: {
       email: "",
@@ -67,14 +60,13 @@ const SignupForm = () => {
   });
 
   const onSubmit = async ({ email, password }: SignUpData) => {
+    setError(null);
+    setNotice("");
     const { data, error } = await supabase.auth.signUp({ email, password });
-    router.navigate({
-      pathname: "/profile",
-    });
     if (error) {
       setError(error.message);
     } else if (!data.session) {
-      // Email confirmation is on: the account exists, but nobody is signed in yet
+      // Email Confirmation disabled
       setNotice("Check your email to confirm your account.");
     }
   };
@@ -84,15 +76,26 @@ const SignupForm = () => {
       <Text style={{ fontSize: 30, padding: 10 }}>Sign Up</Text>
 
       <Text style={styles.title}>Email</Text>
-      <Field control={control} name="email" email />
+      <Field control={control} name="email" email disabled={isSubmitting} />
       <Text style={styles.title}>Password</Text>
-      <Field control={control} name="password" secure />
+      <Field control={control} name="password" secure disabled={isSubmitting} />
       <Text style={styles.title}>Confirm Password</Text>
-      <Field control={control} name="confirmPassword" secure />
+      <Field
+        control={control}
+        name="confirmPassword"
+        secure
+        disabled={isSubmitting}
+      />
       <Text>{notice}</Text>
       <Text style={styles.error}>{error}</Text>
-      <Pressable style={styles.button} onPress={() => handleSubmit(onSubmit)()}>
-        <Text style={[{ color: "#ffffff" }]}>Sign Up</Text>
+      <Pressable
+        style={[styles.button, isSubmitting && styles.disabledButton]}
+        onPress={() => handleSubmit(onSubmit)()}
+        disabled={isSubmitting}
+      >
+        <Text style={styles.buttonText}>
+          {isSubmitting ? "Creating account..." : "Sign Up"}
+        </Text>
       </Pressable>
       <Pressable onPress={() => router.navigate("./sign-in")}>
         <Text style={{ color: "#006fbf" }}>
@@ -112,8 +115,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 10,
     backgroundColor: "#e8e8e8",
+    borderWidth: 1,
+    borderColor: "#e8e8e8",
     width: 300,
     height: 40,
+  },
+  invalidField: {
+    borderColor: "#ff0000",
   },
   error: {
     color: "#ff0000",
@@ -127,6 +135,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
     width: 300,
     height: 40,
+  },
+  disabledButton: {
+    opacity: 0.6,
+  },
+  buttonText: {
+    color: "#ffffff",
   },
 });
 export default SignupForm;
