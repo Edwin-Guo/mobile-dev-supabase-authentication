@@ -10,12 +10,13 @@ interface Profile {
 }
 
 const profile = () => {
+  const [profiles, setProfiles] = useState<Profile[]>([]);
   useEffect(() => {
-    getInstruments();
+    getProfiles();
   }, []);
 
-  async function getInstruments() {
-    const { data, error } = await supabase.from("instruments").select();
+  async function getProfiles() {
+    const { data, error } = await supabase.from("profiles").select();
 
     if (error) {
       // setError(error.message);
