@@ -94,6 +94,11 @@ const SignupForm = () => {
       <Pressable style={styles.button} onPress={() => handleSubmit(onSubmit)()}>
         <Text style={[{ color: "#ffffff" }]}>Sign Up</Text>
       </Pressable>
+      <Pressable onPress={() => router.navigate("./SignIn")}>
+        <Text style={{ color: "#006fbf" }}>
+          Already have an account? Sign in
+        </Text>
+      </Pressable>
     </View>
   );
 };
