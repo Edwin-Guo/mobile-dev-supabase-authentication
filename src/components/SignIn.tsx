@@ -1,7 +1,10 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { router } from "expo-router";
+import { useState } from "react";
 import { Control, Controller, FieldPath, useForm } from "react-hook-form";
 import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { z } from "zod";
+import { supabase } from "../lib/supabase";
 
 const signInSchema = z.object({
   email: z.email("Please enter a valid email").trim(),
@@ -44,14 +47,24 @@ function Field({ control, name, secure, email }: FieldProps) {
 }
 
 const SignInForm = () => {
+  const [error, setError] = useState<string | null>(null);
   const { control, handleSubmit } = useForm<SignInData>({
     resolver: zodResolver(signInSchema),
     defaultValues: { email: "", password: "" },
     mode: "onSubmit",
   });
 
-  const onSubmit = async ({ email }: SignInData) => {
-    console.log("Sign in submitted for", email);
+  const onSubmit = async ({ email, password }: SignInData) => {
+    setError(null);
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+    if (error) {
+      setError(error.message);
+      return;
+    }
+    router.replace("/profile");
   };
 
   return (
@@ -62,6 +75,7 @@ const SignInForm = () => {
       <Field control={control} name="email" email />
       <Text style={styles.title}>Password</Text>
       <Field control={control} name="password" secure />
+      {error && <Text style={styles.error}>{error}</Text>}
       <Pressable style={styles.button} onPress={() => handleSubmit(onSubmit)()}>
         <Text style={{ color: "#ffffff" }}>Sign In</Text>
       </Pressable>
